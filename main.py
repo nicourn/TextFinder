@@ -13,6 +13,8 @@ class Player:
         return f"{self.name}: {self.bank}"
 
 def get_text(image, shadow):
+    if image.size == 0:
+        return ""
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     size = image.shape[:2]
     y, x = size[0] * 3, size[1] * 4
@@ -64,15 +66,7 @@ for i in os.listdir():
         for i in range(t):
             find = cv2.matchTemplate(g_img, pbase, cv2.TM_SQDIFF)
             score, _, minc, _ = cv2.minMaxLoc(find)
-            cv2.rectangle(g_img, minc, (minc[0] + w, minc[1] + h), (0, 0, 255), -1)
-            if minc[0] in rectsw and minc[1] in rectsh:
-                continue
-            else:
-                rectsh += [h for h in range(minc[1] + h * (-1), minc[1] + h * 1)]
-                rectsw += [w for w in range(minc[0] + w * (-1), minc[0] + w * 1)]
-                cv2.rectangle(image, (minc[1] + h * (-1), minc[1] + h * 1),(minc[0] + w * (-1), minc[0] + w * 1), (0, 0, 255), -1)
-                pass
-
+            cv2.rectangle(g_img, (minc[0] - (5 * w), minc[1] - h),(minc[0]  + (6 * w) , minc[1] + (2 * h)), (0, 0, 255), -1)
             cv2.rectangle(image, minc, (minc[0] + w, minc[1] + h), (0, 0, 255), 1)
             if n == 0:
                 bank_image = image[minc[1] + (h//2): minc[1] + h, minc[0] - (w * 3): minc[0] + (w // 5)]
@@ -85,7 +79,6 @@ for i in os.listdir():
             else:
                 bank = get_text(bank_image, True)
             # print(score / 100000, bank)
-            cv2.imwrite(f"{len(os.listdir())}.png", bank_image)
             players.append(Player(name, bank))
 
     find = cv2.matchTemplate(fish_i, fish, cv2.TM_SQDIFF)
